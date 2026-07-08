@@ -6,18 +6,35 @@ on:
       - main
 
 jobs:
-  marp:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: marp-team/marp-cli-action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          files: .
-          output: output
+          node-version: 20
 
-      - uses: actions/upload-artifact@v4
+      - name: Install Marp CLI
+        run: npm install -g @marp-team/marp-cli
+
+      - name: Create output folder
+        run: mkdir -p output
+
+      - name: Generate HTML
+        run: marp EU_PPWR_2025.md -o output/EU_PPWR_2025.html
+
+      - name: Generate PDF
+        run: marp --pdf EU_PPWR_2025.md -o output/EU_PPWR_2025.pdf
+
+      - name: Generate PPTX
+        run: marp --pptx EU_PPWR_2025.md -o output/EU_PPWR_2025.pptx
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: slides
-          path: output
+          path: output/
